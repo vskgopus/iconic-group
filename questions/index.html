@@ -1,0 +1,370 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<!-- Template: {{...}} placeholders are filled from brand/brand.json by scripts/brand.mjs (npm run build:demo). -->
+<title>D Square Works Review Questions</title>
+<meta name="author" content="VSK Software">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500&display=swap">
+<style>
+/* Layout: one narrow column of question cards, sticky progress bar, sending options at the end. */
+:root {
+  --bg: #e8ebea;
+  --surface: #ffffff;
+  --text: #1f2a33;
+  --text-soft: #52606b;
+  --line: #e2e6e4;
+  --line-strong: #c9cfcd;
+  --header: #17212a;
+  --on-dark: #ffffff;
+  --accent: #3a3e9e;
+  --accent-solid: #3a3e9e;
+  --accent-tint: #e9eaf7;
+  --ok: #2c7350;
+  --ok-tint: #e2efe8;
+  --warn: #a8681a;
+  --warn-tint: #f6ecdc;
+  --bad: #c42b2b;
+  --font: 'Barlow', system-ui, sans-serif;
+  --figures: 'Barlow Semi Condensed', 'Barlow', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f161b; --surface: #1c262f; --text: #e4e9ec; --text-soft: #9aa8b2;
+    --line: #26323c; --line-strong: #3a4752; --header: #1a2530; --accent: #a9adff;
+    --accent-tint: #2a2e57; --ok: #63c493; --ok-tint: #1b3a2b; --warn: #e3a64e;
+    --warn-tint: #3f2f17; --bad: #ff7a6e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f161b; --surface: #1c262f; --text: #e4e9ec; --text-soft: #9aa8b2;
+  --line: #26323c; --line-strong: #3a4752; --header: #1a2530; --accent: #a9adff;
+  --accent-tint: #2a2e57; --ok: #63c493; --ok-tint: #1b3a2b; --warn: #e3a64e;
+  --warn-tint: #3f2f17; --bad: #ff7a6e; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.45; }
+.wrap { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 48px; }
+
+.hero { background: var(--header); color: var(--on-dark); }
+.hero .wrap { padding-block: 32px 40px; }
+.nb { white-space: nowrap; }
+.brandrow { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; font-weight: 600; }
+.brandrow .logo { width: 40px; height: 40px; padding: 3px; border-radius: 10px; background: #fff; }
+.hero h1 { margin: 0; font-size: 2rem; font-weight: 600; line-height: 1.15; text-wrap: balance; }
+.hero p { margin: 10px 0 0; max-width: 60ch; color: rgba(255,255,255,.78); }
+.hero .who { margin-top: 22px; display: grid; gap: 6px; max-width: 360px; }
+.hero label { font-size: .875rem; font-weight: 600; color: rgba(255,255,255,.78); }
+.hero input { min-height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: var(--on-dark); font: inherit; }
+
+.progress { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.progress .wrap { display: flex; align-items: center; gap: 12px; padding-block: 10px; }
+.progress__bar { flex: 1; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.progress__fill { height: 100%; width: 0; background: var(--accent-solid); border-radius: 4px; transition: width .25s ease; }
+.progress__text { font-family: var(--figures); font-size: .875rem; color: var(--text-soft); white-space: nowrap; }
+
+section.part { margin-top: 28px; }
+.part h2 { margin: 0 4px 4px; font-size: 1.25rem; font-weight: 600; }
+.part > p { margin: 0 4px 12px; color: var(--text-soft); font-size: .9375rem; }
+
+.q { background: var(--surface); border-radius: 18px; padding: 18px; margin-top: 10px; border: 1px solid transparent; }
+.q.is-done { border-color: var(--line); }
+.q fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+.q legend, .q .q__label { padding: 0; font-weight: 600; font-size: 1rem; }
+.q .proposal { margin: 8px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--accent-tint); font-size: .9375rem; }
+.q .proposal strong { color: var(--accent); }
+.q .help { margin: 6px 0 0; color: var(--text-soft); font-size: .875rem; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt span { display: inline-block; padding: 10px 14px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: .9375rem; font-weight: 500; cursor: pointer; }
+.opt input:checked + span { background: var(--accent-solid); border-color: transparent; color: #fff; }
+.opt input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+.agree .opt:nth-child(1) input:checked + span { background: var(--ok); }
+.agree .opt:nth-child(2) input:checked + span { background: var(--warn); }
+textarea, .q input[type=text], .q input[type=number] { width: 100%; margin-top: 10px; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); color: var(--text); font: inherit; }
+textarea { min-height: 70px; resize: vertical; }
+textarea:focus, input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+.note-label { display: block; margin-top: 10px; font-size: .8125rem; color: var(--text-soft); }
+
+.send { margin-top: 32px; background: var(--surface); border-radius: 18px; padding: 20px; }
+.send h2 { margin: 0; font-size: 1.25rem; }
+.send p { margin: 6px 0 0; color: var(--text-soft); }
+.buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--text); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+.btn--primary { background: var(--accent-solid); border-color: transparent; color: #fff; }
+.btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.status { margin-top: 12px; font-weight: 500; }
+.status.ok { color: var(--ok); }
+.status.bad { color: var(--bad); }
+.copybox { width: 100%; min-height: 160px; margin-top: 12px; font-family: var(--figures); font-size: .875rem; }
+.foot { margin-top: 24px; color: var(--text-soft); font-size: .8125rem; }
+@media (max-width: 480px) { .hero h1 { font-size: 1.6rem; } .btn { flex: 1 1 100%; } }
+@media (prefers-reduced-motion: reduce) { .progress__fill { transition: none; } }
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brandrow"><img class="logo" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%22-6%20-6%20112%20112%22%20role%3D%22img%22%20aria-label%3D%22D%20Square%20logo%22%3E%0A%20%20%3C!--%20D%20Square%20mark%2C%20traced%20from%20the%20company's%20logo%3A%20a%20D%20inside%20an%20open%20square.%20--%3E%0A%20%20%3Cg%20fill%3D%22%232e3a87%22%20transform%3D%22rotate(180%2050%2050)%22%3E%0A%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%22%20height%3D%2210.5%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2210.5%22%20height%3D%22100%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%2289.5%22%20width%3D%22100%22%20height%3D%2210.5%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2289.5%22%20y%3D%220%22%20width%3D%2210.5%22%20height%3D%2279%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Cpath%20transform%3D%22rotate(180%2050%2050)%22%20fill%3D%22none%22%20stroke%3D%22%232e3a87%22%20stroke-width%3D%2211%22%20stroke-linejoin%3D%22miter%22%0A%20%20%20%20d%3D%22M95%2073.4%20H52.6%20A23%2023%200%200%201%2052.6%2027.4%20H70.4%20V56.8%22%2F%3E%0A%3C%2Fsvg%3E%0A" alt=""><span>D Square Works</span></div>
+    <h1>Questions for <span class="nb">D Square Constructions India Pvt Ltd</span></h1>
+    <p>The D Square Works prototype makes some guesses about how D Square Constructions India Pvt Ltd works. Please tell us where they are right, and where they need to change. Short answers are fine; skip anything you are not sure about.</p>
+    <div class="who">
+      <label for="respondent">Your name (optional)</label>
+      <input id="respondent" type="text" autocomplete="name">
+    </div>
+  </div>
+</header>
+
+<div class="progress" aria-hidden="true">
+  <div class="wrap">
+    <div class="progress__bar"><div class="progress__fill" id="fill"></div></div>
+    <span class="progress__text" id="ptext">0 answered</span>
+  </div>
+</div>
+
+<main class="wrap" id="form"></main>
+
+<div class="wrap">
+  <section class="send" aria-labelledby="send-h">
+    <h2 id="send-h">Send your answers</h2>
+    <p id="send-intro">Your answers are kept on this device while you fill them in. When you are done, send them back using one of the buttons below.</p>
+    <div class="buttons">
+      <button type="button" class="btn btn--primary" id="save" hidden>Save answers</button>
+      <a class="btn btn--primary" id="wa" href="#" target="_blank" rel="noopener">Send on WhatsApp</a>
+      <button type="button" class="btn" id="copy">Copy answers</button>
+    </div>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+    <textarea class="copybox" id="copybox" readonly hidden aria-label="Your answers as text"></textarea>
+  </section>
+  <p class="foot">Questions from the D Square Works project plan, prepared for D Square Constructions India Pvt Ltd, Dindigul, Tamil Nadu. Nothing here is final until you agree.<br>Software by VSK Software. © 2026 VSK Software. All rights reserved.</p>
+</div>
+
+<script>
+(() => {
+  // ---------- Questions ----------
+  // type: choice (pick one), multi (pick any), agree (Agree / Change it / Not sure + note),
+  // text, number. "other: true" adds a free-text box.
+  const AGREE = ['Agree', 'Change it', 'Not sure'];
+  const PARTS = [
+    { title: 'Your company', intro: 'A few basics so the software fits your size.', qs: [
+      { id: 'projects', type: 'choice', label: 'How many projects do you usually run at the same time?', options: ['1 to 3', '4 to 8', '9 to 15', 'More than 15'] },
+      { id: 'users', type: 'number', label: 'About how many people would use the software (office and site)?' },
+      { id: 'data_now', type: 'multi', label: 'Where do you keep project records today?', options: ['Excel', 'Tally', 'Paper registers', 'WhatsApp', 'Other software'], other: true },
+      { id: 'network', type: 'choice', label: 'How is the mobile internet at your sites?', options: ['Good at all sites', 'Patchy at some sites', 'Poor at most sites'] },
+      { id: 'language', type: 'choice', label: 'Can site staff use the app in English?', options: ['Yes, English is fine', 'They need a regional language'], other: true, otherLabel: 'Which language?' },
+    ]},
+    { title: 'Who does what', intro: 'Each role sees a different menu in the prototype.', qs: [
+      { id: 'role_owner', type: 'agree', label: 'Owner', proposal: 'Sees everything: all projects and money, approves expenses and material indents, reads site reports.' },
+      { id: 'role_pm', type: 'agree', label: 'Project Manager', proposal: 'Runs projects: approves expenses and indents, creates purchase orders, marks attendance, writes site reports, uses the estimator.' },
+      { id: 'role_se', type: 'agree', label: 'Site Engineer', proposal: 'On site: records expenses, raises indents, records deliveries, issues material, marks attendance, writes the daily site report. Sees money.' },
+      { id: 'role_sk', type: 'agree', label: 'Store Keeper', proposal: 'Materials only: raises indents, records deliveries and issues. Sees quantities only, no rates or money.' },
+      { id: 'role_ac', type: 'agree', label: 'Accountant', proposal: 'Pays approved expenses and weekly wages. Does not approve.' },
+      { id: 'approve_self', type: 'agree', label: 'Approving your own entries', proposal: 'Nobody can approve an expense or indent their own role recorded. A Project Manager\'s expense goes to the Owner.' },
+      { id: 'po_by', type: 'multi', label: 'Who should create purchase orders?', options: ['Owner', 'Project Manager', 'Accountant', 'A purchase person'] },
+    ]},
+    { title: 'Budgets', qs: [
+      { id: 'warn_margin', type: 'agree', label: 'Early warning', proposal: 'A project shows "Close to budget" when the forecast is within 5% of the budget.', noteLabel: 'If not 5%, what margin?' },
+      { id: 'progress_money', type: 'agree', label: 'Progress of a whole phase or project', proposal: 'Measured by money: the value of work done divided by the budget (because items have different units).' },
+      { id: 'overheads', type: 'choice', label: 'Site overheads (site office power, security, and so on) are not in any BOQ item. How should they show?', options: ['As overspend against the budget (as now)', 'Add an overhead allowance line to each BOQ', 'Not sure'] },
+    ]},
+    { title: 'Estimator', intro: 'The prototype uses sample rates and rules of thumb. These questions help replace them with yours.', qs: [
+      { id: 'rates_source', type: 'choice', label: 'Which rates should estimates use?', options: ['Our own rate list', 'Government SOR', 'Both'], other: true, otherLabel: 'Which SOR (state, year)?' },
+      { id: 'sqft_cost', type: 'number', label: 'Roughly, what does a standard-spec building cost you per sq.ft today (in rupees)?', help: 'Just a ballpark; it helps check the estimator.' },
+      { id: 'interiors_scope', type: 'multi', label: 'What does a typical interiors job include?', options: ['False ceiling', 'Flooring', 'Wardrobes', 'Modular kitchen', 'Other joinery', 'Electrical and lighting', 'Painting'], other: true },
+      { id: 'samples', type: 'choice', label: 'Can you share a sample BOQ and your rate list (any format, even photos)?', options: ['Yes', 'Later', 'No'] },
+    ]},
+    { title: 'Expenses', qs: [
+      { id: 'bill_limit', type: 'agree', label: 'Bill photo', proposal: 'A photo of the bill is required for expenses above ₹500.', noteLabel: 'If a different amount, which?' },
+      { id: 'resubmit', type: 'choice', label: 'When an expense is rejected, should the person be able to fix it and send it again?', options: ['Yes', 'No, they record a new one'] },
+    ]},
+    { title: 'Materials', qs: [
+      { id: 'store', type: 'choice', label: 'How do you keep material stock?', options: ['Each site has its own store', 'A central store sends to sites', 'Both'] },
+      { id: 'mat_extras', type: 'multi', label: 'Which of these do you need to record?', options: ['Returns to supplier', 'Wastage or damage', 'Transfers between sites', 'Supplier bills against a PO', 'One PO with many materials'] },
+      { id: 'costing', type: 'agree', label: 'Cost of issued material', proposal: 'Issued material is costed at the average rate it was bought at for that site.' },
+    ]},
+    { title: 'Labour', intro: 'These answers can change the labour screens the most.', qs: [
+      { id: 'hiring', type: 'choice', label: 'How are workers hired?', options: ['Directly by us', 'Through labour contractors', 'Both'] },
+      { id: 'contractor_pay', type: 'multi', label: 'If through contractors, how are they paid?', options: ['Per worker per day', 'Per measured work (rate per unit)', 'Lump sum for a job'] },
+      { id: 'wage_cycle', type: 'choice', label: 'How often are wages paid?', options: ['Weekly', 'Fortnightly', 'Monthly'] },
+      { id: 'overtime', type: 'choice', label: 'How is overtime paid?', options: ['Same hourly rate', '1.5 times', '2 times', 'Not paid'] },
+      { id: 'advances', type: 'choice', label: 'Do workers take advances that are cut from later wages?', options: ['Yes', 'No'] },
+    ]},
+    { title: 'Daily site report', qs: [
+      { id: 'report_lock', type: 'choice', label: 'When should a day\'s report stop being editable?', options: ['Never', 'At the end of the next day', 'After the Project Manager checks it'] },
+      { id: 'measurement', type: 'choice', label: 'How should work done be entered?', options: ['Just the quantity (as now)', 'Measurements (length x breadth x depth), like a measurement book'] },
+    ]},
+    { title: 'Anything else', qs: [
+      { id: 'most_wanted', type: 'text', label: 'What would help your business most from this software?' },
+      { id: 'other', type: 'text', label: 'Anything that is missing, wrong or confusing in the prototype?' },
+    ]},
+  ];
+  const ALL = PARTS.flatMap(p => p.qs);
+
+  // ---------- State (kept on this device as a draft) ----------
+  const KEY = 'civilworks.reviewDraft';
+  let state = { name: '', a: {}, note: {}, other: {} };
+  try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.a) state = s; } catch (e) {}
+  const keep = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+
+  // ---------- Render ----------
+  const form = document.getElementById('form');
+  const el = (tag, attrs = {}, kids = []) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === 'text') n.textContent = v; else if (v !== undefined && v !== false) n.setAttribute(k, v === true ? '' : v);
+    }
+    for (const k of [].concat(kids)) if (k) n.append(k);
+    return n;
+  };
+
+  PARTS.forEach((part, pi) => {
+    const sec = el('section', { class: 'part', 'aria-labelledby': `p${pi}` }, [el('h2', { id: `p${pi}`, text: `${pi + 1}. ${part.title}` })]);
+    if (part.intro) sec.append(el('p', { text: part.intro }));
+    part.qs.forEach(q => {
+      const card = el('div', { class: 'q', 'data-q': q.id });
+      if (q.type === 'text' || q.type === 'number') {
+        const id = `in-${q.id}`;
+        card.append(el('label', { class: 'q__label', for: id, text: q.label }));
+        if (q.help) card.append(el('p', { class: 'help', text: q.help }));
+        const input = q.type === 'text'
+          ? el('textarea', { id })
+          : el('input', { id, type: 'number', inputmode: 'numeric', min: '0' });
+        input.value = state.a[q.id] || '';
+        input.addEventListener('input', () => { state.a[q.id] = input.value; changed(); });
+        card.append(input);
+      } else {
+        const multi = q.type === 'multi';
+        const options = q.type === 'agree' ? AGREE : q.options;
+        const fs = el('fieldset', {}, [el('legend', { text: q.label })]);
+        if (q.proposal) fs.append(el('p', { class: 'proposal' }, [el('strong', { text: 'Prototype: ' }), q.proposal]));
+        if (q.help) fs.append(el('p', { class: 'help', text: q.help }));
+        const box = el('div', { class: `opts${q.type === 'agree' ? ' agree' : ''}` });
+        options.forEach(o => {
+          const cur = state.a[q.id];
+          const checked = multi ? Array.isArray(cur) && cur.includes(o) : cur === o;
+          const input = el('input', { type: multi ? 'checkbox' : 'radio', name: q.id, value: o, checked });
+          input.addEventListener('change', () => {
+            if (multi) {
+              const set = new Set(Array.isArray(state.a[q.id]) ? state.a[q.id] : []);
+              input.checked ? set.add(o) : set.delete(o);
+              state.a[q.id] = [...set];
+            } else state.a[q.id] = o;
+            changed();
+          });
+          box.append(el('label', { class: 'opt' }, [input, el('span', { text: o })]));
+        });
+        fs.append(box);
+        card.append(fs);
+        if (q.type === 'agree' || q.other) {
+          const id = `note-${q.id}`;
+          const label = q.noteLabel || q.otherLabel || (q.type === 'agree' ? 'What should change? (optional)' : 'Other (optional)');
+          const t = el('textarea', { id });
+          t.value = (q.type === 'agree' ? state.note[q.id] : state.other[q.id]) || '';
+          t.addEventListener('input', () => { (q.type === 'agree' ? state.note : state.other)[q.id] = t.value; changed(); });
+          card.append(el('label', { class: 'note-label', for: id, text: label }), t);
+        }
+      }
+      sec.append(card);
+    });
+    form.append(sec);
+  });
+
+  const nameInput = document.getElementById('respondent');
+  nameInput.value = state.name || '';
+  nameInput.addEventListener('input', () => { state.name = nameInput.value; changed(); });
+
+  // ---------- Progress, text summary ----------
+  const answered = q => {
+    const v = state.a[q.id];
+    return (Array.isArray(v) ? v.length > 0 : v !== undefined && String(v).trim() !== '') ||
+      Boolean((state.note[q.id] || state.other[q.id] || '').trim());
+  };
+  function summary() {
+    const lines = ['D Square Works: answers from D Square Constructions India Pvt Ltd' + (state.name.trim() ? ` (${state.name.trim()})` : ''), ''];
+    PARTS.forEach((p, pi) => {
+      const qs = p.qs.filter(answered);
+      if (!qs.length) return;
+      lines.push(`${pi + 1}. ${p.title}`);
+      qs.forEach(q => {
+        const v = state.a[q.id];
+        let ans = Array.isArray(v) ? v.join(', ') : (v || '');
+        const extra = (state.note[q.id] || state.other[q.id] || '').trim();
+        if (extra) ans = ans ? `${ans}. ${extra}` : extra;
+        lines.push(`- ${q.label}${/[?:]$/.test(q.label) ? '' : ':'} ${ans}`);
+      });
+      lines.push('');
+    });
+    return lines.join('\n').trim();
+  }
+  const fill = document.getElementById('fill');
+  const ptext = document.getElementById('ptext');
+  const wa = document.getElementById('wa');
+  function changed() {
+    keep();
+    const n = ALL.filter(answered).length;
+    fill.style.width = `${(n / ALL.length) * 100}%`;
+    ptext.textContent = `${n} of ${ALL.length} answered`;
+    document.querySelectorAll('.q').forEach(c => c.classList.toggle('is-done', answered(ALL.find(q => q.id === c.dataset.q))));
+    wa.href = 'https://wa.me/?text=' + encodeURIComponent(summary());
+  }
+  changed();
+
+  // ---------- Sending ----------
+  const status = document.getElementById('status');
+  const copybox = document.getElementById('copybox');
+  const say = (msg, kind) => { status.textContent = msg; status.className = `status ${kind || ''}`; };
+
+  document.getElementById('copy').addEventListener('click', () => {
+    const text = summary();
+    copybox.value = text;
+    copybox.hidden = false;
+    const fallback = () => { copybox.focus(); copybox.select(); say('Select the text below and copy it, then paste it into a message.', ''); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => say('Copied. Paste it into WhatsApp or an email.', 'ok'), fallback);
+    } else fallback();
+  });
+
+  // Saving into the page works for the page's owner and editors; others use copy or WhatsApp.
+  const saveBtn = document.getElementById('save');
+  (async () => {
+    if (!window.claude || !window.claude.use) return;
+    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    if (!db) return;
+    const can = user ? await user.can('data.write') : null;
+    if (can === false) return;
+    saveBtn.hidden = false;
+    document.getElementById('send-intro').textContent =
+      'Your answers are kept on this device while you fill them in. Save them here when you are done, or send them by WhatsApp or copy.';
+    saveBtn.addEventListener('click', async () => {
+      saveBtn.disabled = true;
+      try {
+        // One answer sheet per person, readable only by the page's owner and editors.
+        const uid = user ? await user.id() : null;
+        if (!uid) throw { code: 'invalid_argument' };
+        await db.doc('responses/' + uid).set({
+          savedAt: new Date().toISOString(),
+          name: state.name.trim(),
+          answers: state.a,
+          notes: state.note,
+          other: state.other,
+          text: summary(),
+        });
+        say('Saved. Thank you!', 'ok');
+      } catch (e) {
+        if (e && e.code === 'invalid_argument') {
+          saveBtn.hidden = true;
+          say('Saving here is not available for you. Please use WhatsApp or Copy answers instead.', 'bad');
+        } else {
+          say('Could not save just now. Try again, or use WhatsApp or Copy answers.', 'bad');
+        }
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+  })();
+})();
+</script>
+
+</body></html>
